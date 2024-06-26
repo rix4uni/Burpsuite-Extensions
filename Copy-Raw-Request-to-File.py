@@ -34,15 +34,20 @@ class BurpExtender(IBurpExtender, IContextMenuFactory):
                     self.saveRequestToFile(raw_request)
         
         def saveRequestToFile(self, request):
+            # Ensure the directory exists
+            dir_name = "BURP-REQUEST"
+            if not os.path.exists(dir_name):
+                os.makedirs(dir_name)
+            
             # Determine the next available file name
             file_counter = 1
-            files = os.listdir(".")
+            files = os.listdir(dir_name)
             req_files = [f for f in files if re.match(r'req\d+\.txt', f)]
             if req_files:
                 highest_num = max([int(re.findall(r'\d+', f)[0]) for f in req_files])
                 file_counter = highest_num + 1
             
-            file_name = "req{}.txt".format(file_counter)
+            file_name = os.path.join(dir_name, "req{}.txt".format(file_counter))
             
             # Write the request to the file in binary mode to preserve formatting
             with open(file_name, 'wb') as file:
